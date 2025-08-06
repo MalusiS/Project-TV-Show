@@ -1,3 +1,57 @@
-#root {
-  color: red;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f8f8;
+  margin: 0;
+  padding: 1rem;
+  color: #333;
+}
+
+.episode-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.episode-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  max-width: 300px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.episode-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.episode-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.episode-card div {
+  margin: 0.5rem 0;
+}
+
+.episode-card a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  text-decoration: none;
+  color: #0077cc;
+  font-weight: bold;
+}
+
+.episode-card a:hover {
+  text-decoration: underline;
+}
+
+.credit {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
 }
