@@ -1,12 +1,47 @@
 //You can edit ALL of the code here
 function setup() {
   const allEpisodes = getAllEpisodes();
+  const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "";
+
+  // Create search input and count display
+  const searchContainer = document.createElement("div");
+  searchContainer.classList.add("search-container");
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Search episodes...";
+  searchInput.id = "search-input";
+  const countDisplay = document.createElement("span");
+  countDisplay.id = "count-display";
+  countDisplay.style.marginLeft = "10px";
+  searchContainer.appendChild(searchInput);
+  searchContainer.appendChild(countDisplay);
+  rootElem.appendChild(searchContainer);
+
+  // Initial render
   makePageForEpisodes(allEpisodes);
+  countDisplay.textContent = `Displaying ${allEpisodes.length} / ${allEpisodes.length} episodes`;
+
+  // Live search handler
+  searchInput.addEventListener("input", function () {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const filtered = allEpisodes.filter((ep) => {
+      const name = ep.name ? ep.name.toLowerCase() : "";
+      const summary = ep.summary ? ep.summary.toLowerCase() : "";
+      return name.includes(searchTerm) || summary.includes(searchTerm);
+    });
+    makePageForEpisodes(filtered);
+    countDisplay.textContent = `Displaying ${filtered.length} / ${allEpisodes.length} episodes`;
+  });
 }
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
-  rootElem.innerHTML = ""; // Clear root element
+  // Only clear previous episode container and credit, not search bar
+  const oldContainer = document.querySelector(".episode-container");
+  if (oldContainer) oldContainer.remove();
+  const oldCredit = document.querySelector(".credit");
+  if (oldCredit) oldCredit.remove();
 
   // Create a container for all episodes
   const episodeContainer = document.createElement("div");
