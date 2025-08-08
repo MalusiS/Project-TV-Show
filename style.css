@@ -6,6 +6,38 @@ body {
   color: #333;
 }
 
+/* NEW: Search and Selector Styling */
+.search-container,
+.selector-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-container input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 250px;
+}
+
+#count-display {
+  font-size: 0.9rem;
+  color: #222;
+}
+
+.selector-container select {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.selector-container button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
 .episode-container {
   display: flex;
   flex-wrap: wrap;
