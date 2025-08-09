@@ -4,16 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TV Show Project | Malusi Skunyana (MalusiS)</title>
-    <link rel="stylesheet" href="style.css" />
+    <link href="style.css" rel="stylesheet" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   </head>
+
   <body>
+    <header>
+      <div class="search-container">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search episodes..."
+        />
+        <span id="count-display"></span>
+      </div>
+
+      <div class="selector-container">
+        <select id="episode-select">
+          <option value="">Select an episode...</option>
+        </select>
+        <button id="show-all-btn" style="display: none;">Show All Episodes</button>
+      </div>
+    </header>
+
     <main id="root"></main>
 
-    <!-- Load episodes data -->
-    <script src="episodes.js"></script>
-
-    <!-- Load application logic -->
     <script src="script.js" defer></script>
   </body>
 </html>
