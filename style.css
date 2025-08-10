@@ -46,8 +46,17 @@ header {
   cursor: pointer;
 }
 
-.selector-container button:hover {
+.selector-container button:hover:enabled {
   background-color: #005fa3;
+}
+
+/* Hidden and visible classes */
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: inline-block !important;
 }
 
 .episode-container {
