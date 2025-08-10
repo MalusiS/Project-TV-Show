@@ -1,10 +1,14 @@
-// Global variable to store fetched episodes
+
+// Caches
 let allEpisodes = [];
+let allShows = [];
+const episodesCache = {}; // { showId: [episodes] }
 
 // Run the app after DOM is loaded
+
 window.onload = () => {
   showLoadingMessage();
-  fetchEpisodes();
+  fetchShows();
 };
 
 // Show loading state
@@ -21,44 +25,95 @@ function showErrorMessage(message) {
   rootElem.innerHTML = `<p class="error">${message}</p>`;
 }
 
-// Fetch episodes from the TVMaze API
-function fetchEpisodes() {
-  fetch("https://api.tvmaze.com/shows/82/episodes")
+
+// Fetch all shows (only once per visit)
+function fetchShows() {
+  if (allShows.length > 0) {
+    populateShowSelect();
+    return;
+  }
+  fetch("https://api.tvmaze.com/shows")
     .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Network error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
+      return response.json();
+    })
+    .then((shows) => {
+      // Sort alphabetically, case-insensitive
+      allShows = shows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      populateShowSelect();
+    })
+    .catch((error) => {
+      console.error(error);
+      showErrorMessage("Failed to load shows. Please refresh the page or try again later.");
+    });
+}
+
+function populateShowSelect() {
+  const showSelect = document.getElementById("show-select");
+  showSelect.innerHTML = '<option value="">Select a show...</option>';
+  allShows.forEach((show) => {
+    const opt = document.createElement("option");
+    opt.value = show.id;
+    opt.textContent = show.name;
+    showSelect.appendChild(opt);
+  });
+  // Default: select first show (optional, or keep blank)
+  showSelect.addEventListener("change", handleShowChange);
+}
+
+function handleShowChange() {
+  const showSelect = document.getElementById("show-select");
+  const showId = showSelect.value;
+  if (!showId) {
+    // Clear episodes UI
+    allEpisodes = [];
+    initializeEpisodesPage();
+    return;
+  }
+  if (episodesCache[showId]) {
+    allEpisodes = episodesCache[showId];
+    initializeEpisodesPage();
+    return;
+  }
+  showLoadingMessage();
+  fetch(`https://api.tvmaze.com/shows/${showId}/episodes`)
+    .then((response) => {
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
       return response.json();
     })
     .then((episodes) => {
+      episodesCache[showId] = episodes;
       allEpisodes = episodes;
       initializeEpisodesPage();
     })
     .catch((error) => {
       console.error(error);
-      showErrorMessage(
-        "Failed to load episodes. Please refresh the page or try again later."
-      );
+      showErrorMessage("Failed to load episodes. Please refresh the page or try again later.");
     });
 }
 
 // Initialize the UI after data is fetched
+
 function initializeEpisodesPage() {
   const rootElem = document.getElementById("root");
   rootElem.innerHTML = "";
-
   createSearchAndSelectorUI();
-  makePageForEpisodes(allEpisodes);
-  updateCountDisplay(allEpisodes.length, allEpisodes.length);
+  if (allEpisodes.length > 0) {
+    makePageForEpisodes(allEpisodes);
+    updateCountDisplay(allEpisodes.length, allEpisodes.length);
+  } else {
+    updateCountDisplay(0, 0);
+  }
 }
 
 // Populate search input, episode selector, and show-all button
+
 function createSearchAndSelectorUI() {
   const searchInput = document.getElementById("search-input");
   const episodeSelect = document.getElementById("episode-select");
   const showAllBtn = document.getElementById("show-all-btn");
 
-  // Populate dropdown
+  // Populate episode dropdown
   episodeSelect.innerHTML = '<option value="">Select an episode...</option>';
   allEpisodes.forEach((ep, idx) => {
     const code = formatEpisodeCode(ep.season, ep.number);
@@ -68,10 +123,10 @@ function createSearchAndSelectorUI() {
     episodeSelect.appendChild(opt);
   });
 
-  // Attach event listeners
-  searchInput.addEventListener("input", () => handleSearch(searchInput, episodeSelect, showAllBtn));
-  episodeSelect.addEventListener("change", () => handleEpisodeSelect(episodeSelect, searchInput, showAllBtn));
-  showAllBtn.addEventListener("click", () => handleShowAll(searchInput, episodeSelect, showAllBtn));
+  // Attach event listeners (remove previous to avoid duplicates)
+  searchInput.oninput = () => handleSearch(searchInput, episodeSelect, showAllBtn);
+  episodeSelect.onchange = () => handleEpisodeSelect(episodeSelect, searchInput, showAllBtn);
+  showAllBtn.onclick = () => handleShowAll(searchInput, episodeSelect, showAllBtn);
 }
 
 // Search handler
